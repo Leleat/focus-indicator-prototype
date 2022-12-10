@@ -129,7 +129,6 @@
       <child>
         <object class="AdwPreferencesGroup">
           <property name="title" translatable="yes">Darken</property>
-          <property name="description" translatable="yes">Some of these will be overwritten by the scale settings if the scaling effect is enabled</property>
           <child>
             <object class="AdwActionRow">
               <property name="title" translatable="yes">Darken Non-Focused Windows</property>

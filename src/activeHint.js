@@ -161,44 +161,50 @@ class ActiveHint extends St.Widget {
 
         // Animate non-focused windows
         otherRecords.forEach(record => {
-            const otherClone = this._createClone(record, monitor, {
-                pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
-                scale_x: scale ? startingScale : 1,
-                scale_y: scale ? startingScale : 1
-            });
-
+            const otherClone = this._createClone(record, monitor);
             this._cloneMovementAnimation(otherClone, record.windowActor);
-            otherClone.ease({
-                scale_x: 1,
-                scale_y: 1,
-                delay: scale ? scaleDelay : 0,
-                duration: scale ? scaleDuration : 250,
-                mode: scaleMode
-            });
+
+            if (scale) {
+                otherClone.set_pivot_point(.5, .5);
+                otherClone.set_scale(startingScale, startingScale);
+                otherClone.ease({
+                    scale_x: 1,
+                    scale_y: 1,
+                    delay:scaleDelay,
+                    duration:scaleDuration,
+                    mode: scaleMode
+                });
+            }
 
             if (darken) {
                 const windowFrame = record.windowActor.get_meta_window().get_frame_rect();
-
                 const shade = this._createWidget({
-                    pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
-                    scale_x: scale ? startingScale : 1,
-                    scale_y: scale ? startingScale : 1,
                     style: `background-color: ${darkenColor};`,
                     x: windowFrame.x - (record.windowActor.x - otherClone.x),
                     y: windowFrame.y - (record.windowActor.y - otherClone.y),
                     width: windowFrame.width,
                     height: windowFrame.height
                 });
-
                 this._cloneMovementAnimation(shade, windowFrame);
+
                 shade.ease({
                     opacity: 0,
-                    scale_x: 1,
-                    scale_y: 1,
-                    delay: scale ? scaleDelay : darkenDelay,
-                    duration: scale ? scaleDuration : darkenDuration,
-                    mode: scale ? scaleMode : darkenMode
+                    delay: darkenDelay,
+                    duration: darkenDuration,
+                    mode: darkenMode
                 });
+
+                if (scale) {
+                    shade.set_pivot_point(0.5, 0.5);
+                    shade.set_scale(startingScale);
+                    shade.ease({
+                        scale_x: 1,
+                        scale_y: 1,
+                        delay: scaleDelay,
+                        duration: scaleDuration,
+                        mode: scaleMode
+                    });
+                }
             };
         });
 
@@ -207,41 +213,45 @@ class ActiveHint extends St.Widget {
             const focusFrame = focusedRecord.windowActor.get_meta_window().get_frame_rect();
             const startingPos = this._getAbsPos(focusedRecord.clone);
             const border = this._createWidget({
-                pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
                 style: `background-color: ${borderColor};`,
-                scale_x: scaleFocus ? startingScaleFocus : 1,
-                scale_y: scaleFocus ? startingScaleFocus : 1,
                 x: focusFrame.x - (focusedRecord.windowActor.x - startingPos.x) - borderSize / 2 + monitor.x,
                 y: focusFrame.y - (focusedRecord.windowActor.y - startingPos.y) - borderSize / 2 + monitor.y,
                 width: focusFrame.width + borderSize,
                 height: focusFrame.height + borderSize
             });
-
             this._cloneMovementAnimation(border, {
                 x: focusFrame.x - borderSize / 2,
                 y: focusFrame.y - borderSize / 2
             });
+
             border.ease({
                 opacity: 0,
-                scale_x: 1,
-                scale_y: 1,
                 delay: borderDelay,
                 duration: borderDuration,
                 mode: borderMode
             });
+
+            if (scaleFocus) {
+                border.set_pivot_point(0.5, 0.5);
+                border.set_scale(startingScaleFocus, startingScaleFocus);
+                border.ease({
+                    scale_x: 1,
+                    scale_y: 1,
+                    delay: scaleDelayFocus,
+                    duration: scaleDurationFocus,
+                    mode: scaleModeFocus
+                });
+            }
         }
 
         // Put a copy of the focused window above the other windows
-        const focusedClone = this._createClone(focusedRecord, monitor, {
-            pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
-            scale_x: scaleFocus ? startingScaleFocus : 1,
-            scale_y: scaleFocus ? startingScaleFocus : 1
-        });
-
+        const focusedClone = this._createClone(focusedRecord, monitor);
         this._cloneMovementAnimation(focusedClone, focusedRecord.windowActor);
 
         // Add scale effect to focused window
         if (scaleFocus) {
+            focusedClone.set_pivot_point(0.5, 0.5);
+            focusedClone.set_scale(startingScaleFocus, startingScaleFocus);
             focusedClone.ease({
                 scale_x: 1,
                 scale_y: 1,
