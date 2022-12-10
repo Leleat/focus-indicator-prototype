@@ -196,7 +196,7 @@ class ActiveHint extends St.Widget {
 
                 if (scale) {
                     shade.set_pivot_point(0.5, 0.5);
-                    shade.set_scale(startingScale);
+                    shade.set_scale(startingScale, startingScale);
                     shade.ease({
                         scale_x: 1,
                         scale_y: 1,
