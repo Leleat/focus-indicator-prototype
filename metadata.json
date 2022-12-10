@@ -1,0 +1,9 @@
+{
+  "name": "Focus Indicator",
+  "description": "Indicate the focus after switching workspaces",
+  "uuid": "indicate-focus@leleat-on-github",
+  "settings-schema": "org.gnome.shell.extensions.indicate-focus-prototype",
+  "shell-version": [
+    "43"
+  ]
+}

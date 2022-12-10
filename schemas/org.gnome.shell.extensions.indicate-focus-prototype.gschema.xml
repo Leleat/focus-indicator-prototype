@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+	<schema id="org.gnome.shell.extensions.indicate-focus-prototype" path="/org/gnome/shell/extensions/indicate-focus-prototype/">
+
+		<!-- scale -->
+		<key name="scale" type="b">
+			<default>false</default>
+		</key>
+		<key name="starting-scale" type="i">
+			<default>80</default>
+		</key>
+		<key name="scale-delay" type="i">
+			<default>0</default>
+		</key>
+		<key name="scale-duration" type="i">
+			<default>500</default>
+		</key>
+		<key name="scale-mode" type="i">
+			<default>29</default>
+		</key>
+
+		<!-- darken -->
+		<key name="darken" type="b">
+			<default>false</default>
+		</key>
+		<key name="darken-color" type="s">
+			<default>'rgba(0, 0, 0, .7)'</default>
+		</key>
+		<key name="darken-delay" type="i">
+			<default>250</default>
+		</key>
+		<key name="darken-duration" type="i">
+			<default>500</default>
+		</key>
+		<key name="darken-mode" type="i">
+			<default>29</default>
+		</key>
+
+		<!-- border -->
+		<key name="border" type="b">
+			<default>true</default>
+		</key>
+		<key name="border-size" type="i">
+			<default>20</default>
+		</key>
+		<key name="border-color" type="s">
+			<default>'#3584e4'</default>
+		</key>
+		<key name="border-delay" type="i">
+			<default>0</default>
+		</key>
+		<key name="border-duration" type="i">
+			<default>500</default>
+		</key>
+		<key name="border-mode" type="i">
+			<default>29</default>
+		</key>
+
+		<!-- scale focus -->
+		<key name="scale-focus" type="b">
+			<default>true</default>
+		</key>
+		<key name="starting-scale-focus" type="i">
+			<default>120</default>
+		</key>
+		<key name="scale-delay-focus" type="i">
+			<default>0</default>
+		</key>
+		<key name="scale-duration-focus" type="i">
+			<default>500</default>
+		</key>
+		<key name="scale-mode-focus" type="i">
+			<default>29</default>
+		</key>
+	</schema>
+</schemalist>
