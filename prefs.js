@@ -15,20 +15,8 @@ function fillPreferencesWindow(window) {
 
     window.add(builder.get_object('general'));
 
-    _bindSwitches(settings, builder);
     _bindSpinbuttons(settings, builder);
     _bindComboRows(settings, builder);
-}
-
-function _bindSwitches(settings, builder) {
-    const switches = [
-        'scale-focus',
-    ];
-
-    switches.forEach(key => {
-        const widget = builder.get_object(key.replaceAll('-', '_'));
-        settings.bind(key, widget, 'active', Gio.SettingsBindFlags.DEFAULT);
-    });
 }
 
 function _bindSpinbuttons(settings, builder) {

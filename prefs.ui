@@ -11,17 +11,6 @@
           <property name="title" translatable="yes">Scale (Focus)</property>
           <child>
             <object class="AdwActionRow">
-              <property name="title" translatable="yes">Scale Focused Window</property>
-              <property name="activatable-widget">scale_focus</property>
-              <child>
-                <object class="GtkSwitch" id="scale_focus">
-                  <property name="valign">center</property>
-                </object>
-              </child>
-            </object>
-          </child>
-          <child>
-            <object class="AdwActionRow">
               <property name="title" translatable="yes">Starting Scale (%)</property>
               <property name="activatable-widget">starting_scale_focus</property>
               <child>

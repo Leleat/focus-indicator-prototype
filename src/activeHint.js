@@ -119,7 +119,6 @@ class ActiveHint extends St.Widget {
             Clutter.AnimationMode.EASE_OUT_SINE
         ];
 
-        const scaleFocus = this._settings.get_boolean('scale-focus');
         const startingScaleFocus = this._settings.get_int('starting-scale-focus') / 100;
         const scaleDelayFocus = this._settings.get_int('scale-delay-focus');
         const scaleDurationFocus = this._settings.get_int('scale-duration-focus');
@@ -147,31 +146,20 @@ class ActiveHint extends St.Widget {
         });
 
         // Put a copy of the focused window above the other windows
-        const focusedClone = this._createClone(focusedRecord, monitor);
+        const focusedClone = this._createClone(focusedRecord, monitor, {
+            pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
+            scale_x: startingScaleFocus,
+            scale_y: startingScaleFocus
+        });
         this._cloneMovementAnimation(focusedClone, focusedRecord.windowActor);
 
         // Add scale effect to focused window
-        if (scaleFocus) {
-            focusedClone.set_pivot_point(0.5, 0.5);
-            focusedClone.set_scale(startingScaleFocus, startingScaleFocus);
-            focusedClone.ease({
-                scale_x: 1,
-                scale_y: 1,
-                delay: scaleDelayFocus,
-                duration: scaleDurationFocus,
-                mode: scaleModeFocus
-            });
-        }
-
-        // TODO better way to check when last animation finished for the reset
         focusedClone.ease({
-            opacity: 255,
-            duration: Math.max(
-                scaleFocus ? scaleDurationFocus : 0,
-                250) + Math.max(
-                    scaleFocus ? scaleDelayFocus : 0
-                ),
-            mode: Clutter.AnimationMode.EASE_OUT_CUBIC,
+            scale_x: 1,
+            scale_y: 1,
+            delay: scaleDelayFocus,
+            duration: scaleDurationFocus,
+            mode: scaleModeFocus,
             onComplete: () => this._reset()
         });
     }

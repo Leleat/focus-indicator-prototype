@@ -3,9 +3,6 @@
 	<schema id="org.gnome.shell.extensions.indicate-focus-prototype" path="/org/gnome/shell/extensions/indicate-focus-prototype/">
 
 		<!-- scale focus -->
-		<key name="scale-focus" type="b">
-			<default>true</default>
-		</key>
 		<key name="starting-scale-focus" type="i">
 			<default>102</default>
 		</key>
