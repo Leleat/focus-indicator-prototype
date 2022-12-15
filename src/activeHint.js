@@ -46,9 +46,6 @@ class ActiveHint extends St.Widget {
         if (!focus)
             return;
 
-        if (focus.is_fullscreen() || focus.get_maximized() === Meta.MaximizeFlags.BOTH)
-            return;
-
         this._giveHint(focus);
     }
 
