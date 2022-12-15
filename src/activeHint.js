@@ -119,25 +119,6 @@ class ActiveHint extends St.Widget {
             Clutter.AnimationMode.EASE_OUT_SINE
         ];
 
-        const scale = this._settings.get_boolean('scale');
-        const startingScale = this._settings.get_int('starting-scale') / 100;
-        const scaleDelay = this._settings.get_int('scale-delay');
-        const scaleDuration = this._settings.get_int('scale-duration');
-        const scaleMode = EasingMode[this._settings.get_int('scale-mode')];
-
-        const darken = this._settings.get_boolean('darken');
-        const darkenColor = this._settings.get_string('darken-color');
-        const darkenDelay = this._settings.get_int('darken-delay');
-        const darkenDuration = this._settings.get_int('darken-duration');
-        const darkenMode = EasingMode[this._settings.get_int('darken-mode')];
-
-        const border = this._settings.get_boolean('border');
-        const borderSize = this._settings.get_int('border-size');
-        const borderColor = this._settings.get_string('border-color');
-        const borderDelay = this._settings.get_int('border-delay');
-        const borderDuration = this._settings.get_int('border-duration');
-        const borderMode = EasingMode[this._settings.get_int('border-mode')];
-
         const scaleFocus = this._settings.get_boolean('scale-focus');
         const startingScaleFocus = this._settings.get_int('starting-scale-focus') / 100;
         const scaleDelayFocus = this._settings.get_int('scale-delay-focus');
@@ -163,86 +144,7 @@ class ActiveHint extends St.Widget {
         otherRecords.forEach(record => {
             const otherClone = this._createClone(record, monitor);
             this._cloneMovementAnimation(otherClone, record.windowActor);
-
-            if (scale) {
-                otherClone.set_pivot_point(.5, .5);
-                otherClone.set_scale(startingScale, startingScale);
-                otherClone.ease({
-                    scale_x: 1,
-                    scale_y: 1,
-                    delay:scaleDelay,
-                    duration:scaleDuration,
-                    mode: scaleMode
-                });
-            }
-
-            if (darken) {
-                const windowFrame = record.windowActor.get_meta_window().get_frame_rect();
-                const shade = this._createWidget({
-                    style: `background-color: ${darkenColor};`,
-                    x: windowFrame.x - (record.windowActor.x - otherClone.x),
-                    y: windowFrame.y - (record.windowActor.y - otherClone.y),
-                    width: windowFrame.width,
-                    height: windowFrame.height
-                });
-                this._cloneMovementAnimation(shade, windowFrame);
-
-                shade.ease({
-                    opacity: 0,
-                    delay: darkenDelay,
-                    duration: darkenDuration,
-                    mode: darkenMode
-                });
-
-                if (scale) {
-                    shade.set_pivot_point(0.5, 0.5);
-                    shade.set_scale(startingScale, startingScale);
-                    shade.ease({
-                        scale_x: 1,
-                        scale_y: 1,
-                        delay: scaleDelay,
-                        duration: scaleDuration,
-                        mode: scaleMode
-                    });
-                }
-            };
         });
-
-        // Add border effect
-        if (border) {
-            const focusFrame = focusedRecord.windowActor.get_meta_window().get_frame_rect();
-            const startingPos = this._getAbsPos(focusedRecord.clone);
-            const border = this._createWidget({
-                style: `background-color: ${borderColor};`,
-                x: focusFrame.x - (focusedRecord.windowActor.x - startingPos.x) - borderSize / 2 + monitor.x,
-                y: focusFrame.y - (focusedRecord.windowActor.y - startingPos.y) - borderSize / 2 + monitor.y,
-                width: focusFrame.width + borderSize,
-                height: focusFrame.height + borderSize
-            });
-            this._cloneMovementAnimation(border, {
-                x: focusFrame.x - borderSize / 2,
-                y: focusFrame.y - borderSize / 2
-            });
-
-            border.ease({
-                opacity: 0,
-                delay: borderDelay,
-                duration: borderDuration,
-                mode: borderMode
-            });
-
-            if (scaleFocus) {
-                border.set_pivot_point(0.5, 0.5);
-                border.set_scale(startingScaleFocus, startingScaleFocus);
-                border.ease({
-                    scale_x: 1,
-                    scale_y: 1,
-                    delay: scaleDelayFocus,
-                    duration: scaleDurationFocus,
-                    mode: scaleModeFocus
-                });
-            }
-        }
 
         // Put a copy of the focused window above the other windows
         const focusedClone = this._createClone(focusedRecord, monitor);
@@ -265,14 +167,8 @@ class ActiveHint extends St.Widget {
         focusedClone.ease({
             opacity: 255,
             duration: Math.max(
-                scale ? scaleDuration : 0,
-                darken ? darkenDuration : 0,
-                border ? borderDuration : 0,
                 scaleFocus ? scaleDurationFocus : 0,
                 250) + Math.max(
-                    scale ? scaleDelay : 0,
-                    darken ? darkenDelay : 0,
-                    border ? borderDelay : 0,
                     scaleFocus ? scaleDelayFocus : 0
                 ),
             mode: Clutter.AnimationMode.EASE_OUT_CUBIC,

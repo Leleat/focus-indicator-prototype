@@ -18,14 +18,10 @@ function fillPreferencesWindow(window) {
     _bindSwitches(settings, builder);
     _bindSpinbuttons(settings, builder);
     _bindComboRows(settings, builder);
-    _bindColorButtons(settings, builder);
 }
 
 function _bindSwitches(settings, builder) {
     const switches = [
-        'scale',
-        'darken',
-        'border',
         'scale-focus',
     ];
 
@@ -37,14 +33,6 @@ function _bindSwitches(settings, builder) {
 
 function _bindSpinbuttons(settings, builder) {
     const spinButtons = [
-        'starting-scale',
-        'scale-delay',
-        'scale-duration',
-        'darken-delay',
-        'darken-duration',
-        'border-size',
-        'border-delay',
-        'border-duration',
         'starting-scale-focus',
         'scale-delay-focus',
         'scale-duration-focus'
@@ -59,9 +47,6 @@ function _bindSpinbuttons(settings, builder) {
 
 function _bindComboRows(settings, builder) {
     const comboRows = [
-        'scale-mode',
-        'darken-mode',
-        'border-mode',
         'scale-mode-focus'
     ];
 
@@ -72,21 +57,3 @@ function _bindComboRows(settings, builder) {
     });
 }
 
-function _bindColorButtons(settings, builder) {
-    const colorButtons = [
-        'darken-color',
-        'border-color'
-    ];
-
-    colorButtons.forEach(key => {
-        const widget = builder.get_object(`${key.replaceAll('-', '_')}_button`);
-        widget.connect('color-set', () => {
-            settings.set_string(key, widget.get_rgba().to_string());
-        });
-
-        // initilaize color
-        const rgba = new Gdk.RGBA();
-        rgba.parse(settings.get_string(key));
-        widget.set_rgba(rgba);
-    });
-}
