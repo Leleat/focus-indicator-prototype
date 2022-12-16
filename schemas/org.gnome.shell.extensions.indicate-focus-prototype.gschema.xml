@@ -6,10 +6,10 @@
 			<default>102</default>
 		</key>
 		<key name="scale-delay-focus" type="i">
-			<default>0</default>
+			<default>250</default>
 		</key>
 		<key name="scale-duration-focus" type="i">
-			<default>500</default>
+			<default>250</default>
 		</key>
 		<key name="scale-mode-focus" type="i">
 			<default>29</default>
