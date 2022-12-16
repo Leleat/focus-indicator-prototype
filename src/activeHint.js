@@ -1,6 +1,6 @@
 'use strict';
 
-const { Clutter, GObject, Graphene, Meta, St } = imports.gi;
+const { Clutter, GLib, GObject, Graphene, Meta, St } = imports.gi;
 const { background: Background, main: Main } = imports.ui;
 
 var ActiveHint = GObject.registerClass(
@@ -13,6 +13,8 @@ class ActiveHint extends St.Widget {
 
         this._settings = ExtensionUtils.getSettings(Me.metadata['settings-schema']);
         this._actors = [];
+        this._hintCounter = 0;
+        this._timerId = 0;
 
         global.workspace_manager.connectObject('workspace-switched',
             () => this._onWsSwitched(), this);
@@ -27,11 +29,22 @@ class ActiveHint extends St.Widget {
         this._settings.run_dispose();
         this._settings = null;
 
+        this._timerId && GLib.source_remove(this._timerId);
+        this._timerId = 0;
+        this._hintCounter = 0;
+
         super.destroy();
     }
 
     _reset() {
-        this._actors.forEach(a => a.destroy());
+        const windowActors = global.get_window_actors();
+        const activeWs = global.workspace_manager.get_active_workspace();
+        windowActors.forEach(a => {
+            if (a.get_meta_window().get_workspace() === activeWs)
+                a.show();
+        });
+
+        this._actors.forEach(a => a?.destroy());
         this._actors = [];
     }
 
@@ -76,7 +89,7 @@ class ActiveHint extends St.Widget {
 
         // AFAICS, at this point we shouldn't hit this path but just in case
         // return early. Otherwise we create a background but don't destroy it
-        if (!windowRecords.length)
+        if (!windowRecords?.length)
             return;
 
         // Get prefs
@@ -121,6 +134,19 @@ class ActiveHint extends St.Widget {
         const scaleDurationFocus = this._settings.get_int('scale-duration-focus');
         const scaleModeFocus = EasingMode[this._settings.get_int('scale-mode-focus')];
 
+        this._hintCounter++;
+
+        const currHintCounter = this._hintCounter;
+        const animLength = scaleDelayFocus + scaleDurationFocus;
+        // If I overlooked any kind of bug, do a reset as the last resort with a timer
+        this._timerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, animLength, () => {
+            if (currHintCounter === this._hintCounter)
+                this._reset();
+
+            this._timerId = 0;
+            return GLib.SOURCE_REMOVE;
+        });
+
         // Add background to cover the 'normal' workspace animation since the
         // focus animation may take longer
         const backgroundGroup = new Meta.BackgroundGroup();
@@ -134,7 +160,12 @@ class ActiveHint extends St.Widget {
         this._actors.push(backgroundGroup);
 
         const focusedRecord = windowRecords.find(r => r.windowActor === actor);
-        const otherRecords = windowRecords.filter(r => r.windowActor !== actor);
+        const otherRecords = windowRecords.filter(r => r.windowActor !== actor) ?? [];
+
+        if (!focusedRecord) {
+            this._reset();
+            return;
+        }
 
         // Animate non-focused windows
         otherRecords.forEach(record => {
