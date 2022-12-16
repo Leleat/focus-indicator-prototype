@@ -1,7 +1,43 @@
 'use strict';
 
 const { Clutter, GLib, GObject, Graphene, Meta, St } = imports.gi;
-const { background: Background, main: Main } = imports.ui;
+const { altTab: AltTab, background: Background, main: Main, switcherPopup: SwitcherPopup } = imports.ui;
+
+const EasingMode = [
+    Clutter.AnimationMode.EASE_IN,
+    Clutter.AnimationMode.EASE_IN_BACK,
+    Clutter.AnimationMode.EASE_IN_BOUNCE,
+    Clutter.AnimationMode.EASE_IN_CIRC,
+    Clutter.AnimationMode.EASE_IN_CUBIC,
+    Clutter.AnimationMode.EASE_IN_ELASTIC,
+    Clutter.AnimationMode.EASE_IN_EXPO,
+    Clutter.AnimationMode.EASE_IN_OUT,
+    Clutter.AnimationMode.EASE_IN_OUT_BACK,
+    Clutter.AnimationMode.EASE_IN_OUT_BOUNCE,
+    Clutter.AnimationMode.EASE_IN_OUT_CIRC,
+    Clutter.AnimationMode.EASE_IN_OUT_CUBIC,
+    Clutter.AnimationMode.EASE_IN_OUT_ELASTIC,
+    Clutter.AnimationMode.EASE_IN_OUT_EXPO,
+    Clutter.AnimationMode.EASE_IN_OUT_QUAD,
+    Clutter.AnimationMode.EASE_IN_OUT_QUART,
+    Clutter.AnimationMode.EASE_IN_OUT_QUINT,
+    Clutter.AnimationMode.EASE_IN_OUT_SINE,
+    Clutter.AnimationMode.EASE_IN_QUAD,
+    Clutter.AnimationMode.EASE_IN_QUART,
+    Clutter.AnimationMode.EASE_IN_QUINT,
+    Clutter.AnimationMode.EASE_IN_SINE,
+    Clutter.AnimationMode.EASE_OUT,
+    Clutter.AnimationMode.EASE_OUT_BACK,
+    Clutter.AnimationMode.EASE_OUT_BOUNCE,
+    Clutter.AnimationMode.EASE_OUT_CIRC,
+    Clutter.AnimationMode.EASE_OUT_CUBIC,
+    Clutter.AnimationMode.EASE_OUT_ELASTIC,
+    Clutter.AnimationMode.EASE_OUT_EXPO,
+    Clutter.AnimationMode.EASE_OUT_QUAD,
+    Clutter.AnimationMode.EASE_OUT_QUART,
+    Clutter.AnimationMode.EASE_OUT_QUINT,
+    Clutter.AnimationMode.EASE_OUT_SINE
+];
 
 var ActiveHint = GObject.registerClass(
 class ActiveHint extends St.Widget {
@@ -21,6 +57,69 @@ class ActiveHint extends St.Widget {
         Main.overview.connectObject('showing', () => this._reset(), this);
 
         global.window_group.add_child(this);
+
+        // Indicator focus with app switcher
+        this._appSwitcherFinish = AltTab.AppSwitcherPopup.prototype._finish;
+        AltTab.AppSwitcherPopup.prototype._finish = function(timestamp) {
+            const activeWs = global.workspace_manager.get_active_workspace();
+            const appIcon = this._items[this._selectedIndex];
+            const focus = this._currentWindow < 0
+                ? appIcon.cachedWindows[0]
+                : appIcon.cachedWindows[this._currentWindow];
+
+            if (this._currentWindow < 0)
+                appIcon.app.activate_window(focus, timestamp);
+            else if (appIcon.cachedWindows[this._currentWindow])
+                Main.activateWindow(focus, timestamp);
+
+            SwitcherPopup.SwitcherPopup.prototype._finish.call(this, timestamp);
+
+            // handled by workspaceAnimation
+            if (activeWs !== focus.get_workspace())
+                return;
+
+            const actor = focus.get_compositor_private();
+            if (!actor)
+                return;
+
+            const settings = ExtensionUtils.getSettings(Me.metadata['settings-schema']);
+            const upScale = settings.get_int('app-switcher-up-scale') / 100;
+            const upDelay = settings.get_int('app-switcher-up-delay');
+            const upDuration = settings.get_int('app-switcher-up-duration');
+            const upMode = EasingMode[settings.get_int('app-switcher-up-mode')];
+            const downDelay = settings.get_int('app-switcher-down-delay');
+            const downDuration = settings.get_int('app-switcher-down-duration');
+            const downMode = EasingMode[settings.get_int('app-switcher-down-mode')];
+
+            const clone = new Clutter.Clone({
+                pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
+                source: actor,
+                x: actor.x,
+                y: actor.y
+            });
+            Main.uiGroup.add_child(clone);
+
+            actor.hide();
+
+            clone.ease({
+                scale_x: upScale,
+                scale_y: upScale,
+                delay: upDelay,
+                duration: upDuration,
+                mode: EasingMode[upMode],
+                onComplete: () => clone.ease({
+                    scale_x: 1,
+                    scale_y: 1,
+                    delay: downDelay,
+                    duration: downDuration,
+                    mode: EasingMode[downMode],
+                    onComplete: () => {
+                        actor.show();
+                        clone.destroy();
+                    }
+                })
+            });
+        }
     }
 
     destroy() {
@@ -32,6 +131,9 @@ class ActiveHint extends St.Widget {
         this._timerId && GLib.source_remove(this._timerId);
         this._timerId = 0;
         this._hintCounter = 0;
+
+        AltTab.AppSwitcherPopup.prototype._finish = this._appSwitcherFinish;
+        this._appSwitcherFinish = null;
 
         super.destroy();
     }
@@ -93,42 +195,6 @@ class ActiveHint extends St.Widget {
             return;
 
         // Get prefs
-        const EasingMode = [
-            Clutter.AnimationMode.EASE_IN,
-            Clutter.AnimationMode.EASE_IN_BACK,
-            Clutter.AnimationMode.EASE_IN_BOUNCE,
-            Clutter.AnimationMode.EASE_IN_CIRC,
-            Clutter.AnimationMode.EASE_IN_CUBIC,
-            Clutter.AnimationMode.EASE_IN_ELASTIC,
-            Clutter.AnimationMode.EASE_IN_EXPO,
-            Clutter.AnimationMode.EASE_IN_OUT,
-            Clutter.AnimationMode.EASE_IN_OUT_BACK,
-            Clutter.AnimationMode.EASE_IN_OUT_BOUNCE,
-            Clutter.AnimationMode.EASE_IN_OUT_CIRC,
-            Clutter.AnimationMode.EASE_IN_OUT_CUBIC,
-            Clutter.AnimationMode.EASE_IN_OUT_ELASTIC,
-            Clutter.AnimationMode.EASE_IN_OUT_EXPO,
-            Clutter.AnimationMode.EASE_IN_OUT_QUAD,
-            Clutter.AnimationMode.EASE_IN_OUT_QUART,
-            Clutter.AnimationMode.EASE_IN_OUT_QUINT,
-            Clutter.AnimationMode.EASE_IN_OUT_SINE,
-            Clutter.AnimationMode.EASE_IN_QUAD,
-            Clutter.AnimationMode.EASE_IN_QUART,
-            Clutter.AnimationMode.EASE_IN_QUINT,
-            Clutter.AnimationMode.EASE_IN_SINE,
-            Clutter.AnimationMode.EASE_OUT,
-            Clutter.AnimationMode.EASE_OUT_BACK,
-            Clutter.AnimationMode.EASE_OUT_BOUNCE,
-            Clutter.AnimationMode.EASE_OUT_CIRC,
-            Clutter.AnimationMode.EASE_OUT_CUBIC,
-            Clutter.AnimationMode.EASE_OUT_ELASTIC,
-            Clutter.AnimationMode.EASE_OUT_EXPO,
-            Clutter.AnimationMode.EASE_OUT_QUAD,
-            Clutter.AnimationMode.EASE_OUT_QUART,
-            Clutter.AnimationMode.EASE_OUT_QUINT,
-            Clutter.AnimationMode.EASE_OUT_SINE
-        ];
-
         const startingScaleFocus = this._settings.get_int('starting-scale-focus') / 100;
         const scaleDelayFocus = this._settings.get_int('scale-delay-focus');
         const scaleDurationFocus = this._settings.get_int('scale-duration-focus');

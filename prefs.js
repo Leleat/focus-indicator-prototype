@@ -23,7 +23,12 @@ function _bindSpinbuttons(settings, builder) {
     const spinButtons = [
         'starting-scale-focus',
         'scale-delay-focus',
-        'scale-duration-focus'
+        'scale-duration-focus',
+        'app-switcher-up-scale',
+        'app-switcher-up-delay',
+        'app-switcher-up-duration',
+        'app-switcher-down-delay',
+        'app-switcher-down-duration'
     ];
 
     spinButtons.forEach(key => {
@@ -35,7 +40,9 @@ function _bindSpinbuttons(settings, builder) {
 
 function _bindComboRows(settings, builder) {
     const comboRows = [
-        'scale-mode-focus'
+        'scale-mode-focus',
+        'app-switcher-up-mode',
+        'app-switcher-down-mode'
     ];
 
     comboRows.forEach(key => {
