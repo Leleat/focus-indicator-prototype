@@ -23,19 +23,34 @@
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
-const { ActiveHint } = Me.imports.src.activeHint;
+const { FocusIndicator } = Me.imports.src.focusIndicator;
+const { CustomAppSwitcher } = Me.imports.src.altTab;
+const { CustomWorkspaceAnimation } = Me.imports.src.workspaceAnimation;
+const { CustomSwitchToApplication } = Me.imports.src.switchToApplication;
 
 class Extension {
     constructor() {
     }
 
     enable() {
-        this._hint = new ActiveHint();
+        this._focusIndicator = FocusIndicator.getInstance();
+        this._customAppSwitcher = new CustomAppSwitcher();
+        this._customWorkspaceAnimation = new CustomWorkspaceAnimation();
+        this._customSwitchToApplication = new CustomSwitchToApplication();
     }
 
     disable() {
-        this._hint.destroy();
-        this._hint = null;
+        this._customSwitchToApplication.destroy();
+        this._customSwitchToApplication = null;
+
+        this._customWorkspaceAnimation.destroy();
+        this._customWorkspaceAnimation = null;
+
+        this._customAppSwitcher.destroy();
+        this._customAppSwitcher = null;
+
+        this._focusIndicator.destroy();
+        this._focusIndicator = null;
     }
 }
 

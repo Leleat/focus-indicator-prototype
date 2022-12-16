@@ -21,14 +21,12 @@ function fillPreferencesWindow(window) {
 
 function _bindSpinbuttons(settings, builder) {
     const spinButtons = [
-        'starting-scale-focus',
-        'scale-delay-focus',
-        'scale-duration-focus',
-        'app-switcher-up-scale',
-        'app-switcher-up-delay',
-        'app-switcher-up-duration',
-        'app-switcher-down-delay',
-        'app-switcher-down-duration'
+        'scale-to',
+        'anim-up-delay',
+        'anim-up-duration',
+        'anim-down-delay',
+        'anim-down-duration',
+        'workspace-switch-delay'
     ];
 
     spinButtons.forEach(key => {
@@ -40,9 +38,8 @@ function _bindSpinbuttons(settings, builder) {
 
 function _bindComboRows(settings, builder) {
     const comboRows = [
-        'scale-mode-focus',
-        'app-switcher-up-mode',
-        'app-switcher-down-mode'
+        'anim-up-mode',
+        'anim-down-mode'
     ];
 
     comboRows.forEach(key => {
