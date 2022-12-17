@@ -1,40 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
 	<schema id="org.gnome.shell.extensions.indicate-focus-prototype" path="/org/gnome/shell/extensions/indicate-focus-prototype/">
-		<!-- scale focus -->
-		<key name="starting-scale-focus" type="i">
+		<key name="workspace-switch-delay" type="i">
+			<default>200</default>
+		</key>
+		<key name="scale-to" type="i">
 			<default>102</default>
 		</key>
-		<key name="scale-delay-focus" type="i">
-			<default>250</default>
-		</key>
-		<key name="scale-duration-focus" type="i">
-			<default>250</default>
-		</key>
-		<key name="scale-mode-focus" type="i">
-			<default>29</default>
-		</key>
-		<!-- app switcher scale up -->
-		<key name="app-switcher-up-scale" type="i">
-			<default>102</default>
-		</key>
-		<key name="app-switcher-up-delay" type="i">
+		<key name="anim-up-delay" type="i">
 			<default>0</default>
 		</key>
-		<key name="app-switcher-up-duration" type="i">
+		<key name="anim-up-duration" type="i">
 			<default>100</default>
 		</key>
-		<key name="app-switcher-up-mode" type="i">
+		<key name="anim-up-mode" type="i">
 			<default>29</default>
 		</key>
-		<!-- app switcher scale down -->
-		<key name="app-switcher-down-delay" type="i">
+		<key name="anim-down-delay" type="i">
 			<default>0</default>
 		</key>
-		<key name="app-switcher-down-duration" type="i">
-			<default>100</default>
+		<key name="anim-down-duration" type="i">
+			<default>150</default>
 		</key>
-		<key name="app-switcher-down-mode" type="i">
+		<key name="anim-down-mode" type="i">
 			<default>29</default>
 		</key>
 	</schema>
