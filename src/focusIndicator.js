@@ -80,7 +80,13 @@ var FocusIndicator = class FocusIndicator  {
         if (Main.overview.visible)
             return;
 
-        const source = focus?.get_compositor_private();
+        if (!focus)
+            return;
+
+        if (focus.get_maximized() ===  Meta.MaximizeFlags.BOTH || focus.is_fullscreen())
+            return;
+
+        const source = focus.get_compositor_private();
         if (!source)
             return;
 

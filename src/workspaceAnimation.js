@@ -132,6 +132,7 @@ var CustomWorkspaceAnimation = class CustomWorkspaceAnimation {
                 const ExtensionUtils = imports.misc.extensionUtils;
                 const Me = ExtensionUtils.getCurrentExtension();
                 const settings = ExtensionUtils.getSettings(Me.metadata['settings-schema']);
+
                 focusIndicator.indicate({
                     focus,
                     startingParams: {
