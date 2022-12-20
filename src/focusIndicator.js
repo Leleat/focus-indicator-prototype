@@ -60,6 +60,8 @@ var FocusIndicator = class FocusIndicator  {
 
         this._windowCreateId = global.display.connect('window-created',
             (_, window) => this._onWindowCreated(window));
+
+        this._overviewId = Main.overview.connect('showing', () => this.reset());
     }
 
     destroy() {
@@ -67,6 +69,9 @@ var FocusIndicator = class FocusIndicator  {
 
         global.display.disconnect(this._windowCreateId);
         this._windowCreateId = 0;
+
+        Main.overview.disconnect(this._overviewId);
+        this._overviewId = 0;
     }
 
     reset() {
