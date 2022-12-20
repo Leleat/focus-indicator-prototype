@@ -70,6 +70,7 @@ var FocusIndicator = class FocusIndicator  {
     }
 
     reset() {
+        global.get_window_actors().forEach(a => a.set_opacity(255));
         this._actors.forEach(a => a?.destroy());
         this._actors = [];
         this.focus = null;
@@ -84,17 +85,21 @@ var FocusIndicator = class FocusIndicator  {
         this.reset();
 
         if (Main.overview.visible)
-            return;
+            return false;
 
         if (!focus)
-            return;
+            return false;
 
         if (focus.get_maximized() ===  Meta.MaximizeFlags.BOTH || focus.is_fullscreen())
-            return;
+            return false;
 
         const source = focus.get_compositor_private();
         if (!source)
-            return;
+            return false;
+
+        // hiding doesn't work for the workspaceAnimation. It looks like the
+        // window will be shown again after the switch animation ends...?
+        source.set_opacity(0);
 
         const clone = this._createClone(source, startingParams ?? { x: source.x, y: source.y });
         const scaleTo = animParams?.scaleTo ?? this._settings.get_int('scale-to') / 100;
@@ -125,6 +130,8 @@ var FocusIndicator = class FocusIndicator  {
 
         if (secondaryAnim)
             clone.ease({ ...secondaryAnim });
+
+        return true;
     }
 
     _createClone(source, startingParams) {

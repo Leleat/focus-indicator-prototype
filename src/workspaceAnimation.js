@@ -133,7 +133,7 @@ var CustomWorkspaceAnimation = class CustomWorkspaceAnimation {
                 const Me = ExtensionUtils.getCurrentExtension();
                 const settings = ExtensionUtils.getSettings(Me.metadata['settings-schema']);
 
-                focusIndicator.indicate({
+                if (focusIndicator.indicate({
                     focus,
                     startingParams: {
                         x: absPos.x + monitor.x,
@@ -148,9 +148,10 @@ var CustomWorkspaceAnimation = class CustomWorkspaceAnimation {
                         duration: 250,
                         mode: Clutter.AnimationMode.EASE_OUT_CUBIC,
                     }
-                });
+                })) {
+                    clone.hide();
+                }
             }
-
         }
     }
 }
