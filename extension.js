@@ -20,6 +20,8 @@
 
 'use strict';
 
+const { main: Main } = imports.ui;
+
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
@@ -37,6 +39,8 @@ class Extension {
         this._customAppSwitcher = new CustomAppSwitcher();
         this._customWorkspaceAnimation = new CustomWorkspaceAnimation();
         this._customSwitchToApplication = new CustomSwitchToApplication();
+
+        Main.panel.statusArea['appMenu'].container.hide();
     }
 
     disable() {
@@ -51,6 +55,8 @@ class Extension {
 
         this._focusIndicator.destroy();
         this._focusIndicator = null;
+
+        Main.panel.statusArea['appMenu'].container.show();
     }
 }
 
