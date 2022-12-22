@@ -5,5 +5,6 @@
   "settings-schema": "org.gnome.shell.extensions.indicate-focus-prototype",
   "shell-version": [
     "43"
-  ]
+  ],
+  "url": "https://github.com/Leleat/focus-indicator-prototype"
 }
