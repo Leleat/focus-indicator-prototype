@@ -72,6 +72,8 @@ var FocusIndicator = class FocusIndicator  {
 
         Main.overview.disconnect(this._overviewId);
         this._overviewId = 0;
+
+        FocusIndicator._singleton = null;
     }
 
     reset() {
