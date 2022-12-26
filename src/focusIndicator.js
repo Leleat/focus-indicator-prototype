@@ -75,11 +75,7 @@ var FocusIndicator = class FocusIndicator  {
         Main.overview.disconnect(this._overviewId);
         this._overviewId = 0;
 
-        global.get_window_actors().forEach(a => {
-            const window = a.get_meta_window();
-            const id = this._unmanagedMap.get(window);
-            id && window.disconnect(id);
-        });
+        this._unmanagedMap.forEach((id, window) => window.disconnect(id));
         this._unmanagedMap.clear();
 
         FocusIndicator._singleton = null;
