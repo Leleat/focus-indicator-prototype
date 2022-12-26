@@ -57,7 +57,9 @@ var FocusIndicator = class FocusIndicator  {
         // super+nr and the app switcher (under certain multi monitor circumstances)
         // across a workspace switch...
         this.focus = null;
+        this._unmanagedMap = new Map();
 
+        global.get_window_actors().forEach(a => this._onWindowCreated(a.get_meta_window()));
         this._windowCreateId = global.display.connect('window-created',
             (_, window) => this._onWindowCreated(window));
 
@@ -72,6 +74,13 @@ var FocusIndicator = class FocusIndicator  {
 
         Main.overview.disconnect(this._overviewId);
         this._overviewId = 0;
+
+        global.get_window_actors().forEach(a => {
+            const window = a.get_meta_window();
+            const id = this._unmanagedMap.get(window);
+            id && window.disconnect(id);
+        });
+        this._unmanagedMap.clear();
 
         FocusIndicator._singleton = null;
     }
@@ -163,6 +172,7 @@ var FocusIndicator = class FocusIndicator  {
 
         const unmanagedId = window.connect('unmanaged', () => {
             window.disconnect(unmanagedId);
+            this._unmanagedMap.delete(window);
 
             const focus = global.display.focus_window;
             if (!focus || focus === window)
@@ -170,5 +180,7 @@ var FocusIndicator = class FocusIndicator  {
 
             this.indicate({ focus });
         });
+
+        this._unmanagedMap.set(window, unmanagedId);
     }
 }
