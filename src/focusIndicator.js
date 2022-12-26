@@ -170,6 +170,9 @@ var FocusIndicator = class FocusIndicator  {
             window.disconnect(unmanagedId);
             this._unmanagedMap.delete(window);
 
+            if (window.get_window_type() !== Meta.WindowType.NORMAL)
+                return;
+
             const focus = global.display.focus_window;
             if (!focus || focus === window)
                 return;
