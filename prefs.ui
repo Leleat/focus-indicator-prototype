@@ -33,7 +33,7 @@
                   <property name="valign">center</property>
                   <property name="adjustment">
                     <object class="GtkAdjustment">
-                    <property name="lower">50</property>
+                    <property name="lower">100</property>
                       <property name="upper">200</property>
                       <property name="step-increment">2</property>
                       <property name="page-increment">50</property>
