@@ -10,12 +10,21 @@ const { FocusIndicator } = Me.imports.src.focusIndicator;
 var CustomWorkspaceAnimation = class CustomWorkspaceAnimation {
     constructor() {
         this._workspaceAnimationAnimateSwitch = Main.wm._workspaceAnimation.animateSwitch;
+        this._workspaceAnimationfinishWorkspaceSwitch = Main.wm._workspaceAnimation._finishWorkspaceSwitch;
+        this._swipeBeginId = 0;
+
         this._override();
     }
 
     destroy() {
         Main.wm._workspaceAnimation.animateSwitch = this._workspaceAnimationAnimateSwitch;
         this._workspaceAnimationAnimateSwitch = null;
+
+        Main.wm._workspaceAnimation._finishWorkspaceSwitch = this._workspaceAnimationfinishWorkspaceSwitch;
+        this._workspaceAnimationfinishWorkspaceSwitch = null;
+
+        Main.wm._workspaceAnimation._swipeTracker.disconnect(this._swipeBeginId);
+        this._swipeBeginId = 0;
     }
 
     _override() {
@@ -125,7 +134,7 @@ var CustomWorkspaceAnimation = class CustomWorkspaceAnimation {
                         pos.y += parent.y;
                         parent = parent.get_parent();
                     }
-    
+
                     return pos;
                 };
                 const absPos = getAbsPos(clone);
@@ -151,6 +160,35 @@ var CustomWorkspaceAnimation = class CustomWorkspaceAnimation {
                 })) {
                     clone.hide();
                 }
+            }
+        }
+
+        this._swipeBeginId = Main.wm._workspaceAnimation._swipeTracker.connect('begin', () => {
+            this._isSwipe = true;
+            FocusIndicator.getInstance().reset();
+        });
+
+        const that = this;
+
+        Main.wm._workspaceAnimation._finishWorkspaceSwitch = function(switchData) {
+            Meta.enable_unredirect_for_display(global.display);
+
+            this._switchData = null;
+
+            switchData.monitors.forEach(m => m.destroy());
+
+            this.movingWindow = null;
+
+            ////////////////////
+            // Indicate focus //
+            ////////////////////
+
+            if (that._isSwipe) {
+                that._isSwipe = false;
+
+                const focusIndicator = FocusIndicator.getInstance();
+                const focus = global.display.focus_window;
+                focusIndicator.indicate({ focus });
             }
         }
     }
