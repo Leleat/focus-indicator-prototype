@@ -103,7 +103,7 @@ var FocusIndicator = class FocusIndicator  {
             return false;
 
         if (focus.get_maximized() ===  Meta.MaximizeFlags.BOTH
-            || focus.is_fullscreen() || focus.is_hidden())
+            || focus.is_fullscreen() || focus.minimized)
             return false;
 
         const source = focus.get_compositor_private();
