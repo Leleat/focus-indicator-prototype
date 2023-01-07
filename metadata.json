@@ -1,6 +1,6 @@
 {
   "name": "Focus Indicator",
-  "description": "Indicate the focus after switching workspaces",
+  "description": "Please read https://discourse.gnome.org/t/window-focus-call-for-testing/13277 and leave feedback there.\n\nReport bugs on Github. Note that this extension modifies GNOME Shell's native App Switcher (Alt/Super+Tab) and Workspace-Switching-Animation. That means it may be incompatible with other extensions, which also affect those.",
   "uuid": "indicate-focus@leleat-on-github",
   "settings-schema": "org.gnome.shell.extensions.indicate-focus-prototype",
   "shell-version": [
