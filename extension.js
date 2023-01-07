@@ -56,6 +56,12 @@ class Extension {
         this._focusIndicator.destroy();
         this._focusIndicator = null;
 
+        // Looks like g-s updates the top panel after the extensions are disabled
+        // so we want to exit early here otherwise the appMenu will be shown on
+        // the lockscreen while the extension is enabled...
+        if (Main.sessionMode.isLocked)
+            return;
+
         Main.panel.statusArea['appMenu'].container.show();
     }
 }
