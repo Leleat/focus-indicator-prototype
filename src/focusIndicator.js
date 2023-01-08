@@ -1,7 +1,7 @@
 'use strict';
 
 const { Clutter, Gio, Graphene, Meta, Shell } = imports.gi;
-const { main: Main } = imports.ui;
+const { main: Main, osdWindow: OsdWindow } = imports.ui;
 
 const EasingMode = [
     Clutter.AnimationMode.EASE_IN,
@@ -153,7 +153,14 @@ var FocusIndicator = class FocusIndicator  {
             source: source,
             ...startingParams
         });
-        Main.uiGroup.add_child(clone);
+
+        const osd = Main.uiGroup.get_children().find(child =>
+            child instanceof OsdWindow.OsdWindow);
+
+        if (osd)
+            Main.uiGroup.insert_child_below(clone, osd);
+        else
+            Main.uiGroup.add_child(clone);
 
         this._actors.push(clone);
 
