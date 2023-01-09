@@ -114,7 +114,9 @@ var FocusIndicator = class FocusIndicator  {
         // window will be shown again after the switch animation ends...?
         source.set_opacity(0);
 
-        const clone = this._createClone(source, startingParams ?? { x: source.x, y: source.y });
+        const monitor = source.get_meta_window().get_monitor();
+        const monitorRect = global.display.get_monitor_geometry(monitor);
+        const clone = this._createClone(source, monitorRect, startingParams ?? { x: source.x, y: source.y });
         const scaleTo = animParams?.scaleTo ?? this._settings.get_int('scale-to') / 100;
         const upDelay = animParams?.upDelay ?? this._settings.get_int('anim-up-delay');
         const upDuration = animParams?.upDuration ?? this._settings.get_int('anim-up-duration');
@@ -141,28 +143,42 @@ var FocusIndicator = class FocusIndicator  {
             }
         });
 
-        if (secondaryAnim)
+        if (secondaryAnim) {
+            // clone is a child of an actor with monitor dimensions while param
+            // is using absolute position coords
+            secondaryAnim.x = secondaryAnim.x ? secondaryAnim.x - monitorRect.x : undefined;
+            secondaryAnim.y = secondaryAnim.y ? secondaryAnim.y - monitorRect.y : undefined;
             clone.ease({ ...secondaryAnim });
+        }
 
         return true;
     }
 
-    _createClone(source, startingParams) {
-        const clone = new Clutter.Clone({
-            pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
-            source: source,
-            ...startingParams
+    _createClone(source, monitorRect, startingParams) {
+        const clipTo = new Clutter.Actor({
+            clip_to_allocation: true,
+            x: monitorRect.x,
+            y: monitorRect.y,
+            width: monitorRect.width,
+            height: monitorRect.height,
         });
-
         const osd = Main.uiGroup.get_children().find(child =>
             child instanceof OsdWindow.OsdWindow);
 
         if (osd)
-            Main.uiGroup.insert_child_below(clone, osd);
+            Main.uiGroup.insert_child_below(clipTo, osd);
         else
-            Main.uiGroup.add_child(clone);
+            Main.uiGroup.add_child(clipTo);
 
-        this._actors.push(clone);
+        this._actors.push(clipTo);
+
+        const clone = new Clutter.Clone({
+            pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
+            source,
+            x: startingParams.x - clipTo.x,
+            y: startingParams.y - clipTo.y
+        });
+        clipTo.add_child(clone);
 
         return clone;
     }
