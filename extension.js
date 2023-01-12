@@ -41,9 +41,24 @@ class Extension {
         this._customSwitchToApplication = new CustomSwitchToApplication();
 
         Main.panel.statusArea['appMenu'].container.hide();
+
+        if (this._wasLocked) {
+            this._unlockId = Main.screenShield.actor.connect('hide', () => {
+                Main.screenShield.actor.disconnect(this._unlockId);
+                this._unlockId = 0;
+
+                const focus = global.display.focus_window;
+                this._focusIndicator.indicate({ focus });
+            });
+
+            this._wasLocked = false;
+        }
     }
 
     disable() {
+        this._unlockId && Main.screenShield.actor.disconnect(this._unlockId);
+        this._unlockId = 0;
+
         this._customSwitchToApplication.destroy();
         this._customSwitchToApplication = null;
 
@@ -59,8 +74,10 @@ class Extension {
         // Looks like g-s updates the top panel after the extensions are disabled
         // so we want to exit early here otherwise the appMenu will be shown on
         // the lockscreen while the extension is enabled...
-        if (Main.sessionMode.isLocked)
+        if (Main.sessionMode.isLocked) {
+            this._wasLocked = true;
             return;
+        }
 
         Main.panel.statusArea['appMenu'].container.show();
     }
