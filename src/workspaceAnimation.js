@@ -127,6 +127,13 @@ var CustomWorkspaceAnimation = class CustomWorkspaceAnimation {
             } else {
                 const monitor = global.display.get_monitor_geometry(focus.get_monitor());
                 const getAbsPos = actor => {
+                    // get_transformed_position seems to work during swipe
+                    // gestures but not during switching with keyboard shortcuts
+                    // havent looked into why that is...
+                    const transformPos = actor.get_transformed_position();
+                    if (transformPos[0] && transformPos[1])
+                        return { x: transformPos[0], y: transformPos[1] };
+
                     let pos = { x: actor.x, y: actor.y };
                     let parent = actor.get_parent();
                     while (parent) {
@@ -134,6 +141,9 @@ var CustomWorkspaceAnimation = class CustomWorkspaceAnimation {
                         pos.y += parent.y;
                         parent = parent.get_parent();
                     }
+
+                    pos.x += monitor.x;
+                    pos.y += monitor.y;
 
                     return pos;
                 };
@@ -145,8 +155,8 @@ var CustomWorkspaceAnimation = class CustomWorkspaceAnimation {
                 if (focusIndicator.indicate({
                     focus,
                     startingParams: {
-                        x: absPos.x + monitor.x,
-                        y: absPos.y + monitor.y,
+                        x: absPos.x,
+                        y: absPos.y,
                     },
                     animParams: {
                         upDelay: settings.get_int('workspace-switch-delay')
@@ -167,20 +177,98 @@ var CustomWorkspaceAnimation = class CustomWorkspaceAnimation {
             FocusIndicator.getInstance().reset();
         });
 
-        this._swipeEndId = Main.wm._workspaceAnimation._swipeTracker.connect('end', () => {
+        this._swipeEndId = Main.wm._workspaceAnimation._swipeTracker.connect('end', (tracker, duration, endProgress) => {
+            const focusIndicator = FocusIndicator.getInstance();
             const switchData = Main.wm._workspaceAnimation._switchData;
-            if (!switchData)
+
+            // No switchData if there is nothing to animate; for instance if the
+            // swipe gesture was big enough to fully lead to the new ws
+            if (!switchData) {
+                const focus = global.display.focus_window;
+                focusIndicator.indicate({ focus });
                 return;
+            }
 
             const monitorGroup = switchData.monitors[0];
             const transition = monitorGroup?.get_transition('progress');
             if (!transition)
                 return;
 
-            transition.connect('stopped', () => {
-                const focusIndicator = FocusIndicator.getInstance();
-                const focus = global.display.focus_window;
-                focusIndicator.indicate({ focus });
+            const newWs = switchData.baseMonitorGroup.findClosestWorkspace(endProgress);
+            // The animation for the workspace switching is variable. From testing
+            // it can range from 100 - 400 ms. When switching workspaces with
+            // keyboard shortcuts, the focus indication starts at 200 ms of the
+            // 250 ms animation. So try to make it feel similiar for swiping...
+            const marker = 200 * transition.get_duration() / 250;
+
+            transition.add_marker_at_time('start_focus_indication', marker);
+            transition.connect('marker-reached', (transition, markerName, msecs) => {
+                if (markerName !== 'start_focus_indication')
+                    return;
+
+                // ... everything below here is basically copy/pasted from above :x
+
+                const focus = AltTab.getWindows(newWs)[0];
+                if (!focus)
+                    return;
+
+                const focusActor = focus.get_compositor_private();
+                let clone = null;
+
+                switchData.monitors.find(monitorGroup => {
+                    return monitorGroup._workspaceGroups.find(workspaceGroup => {
+                        return workspaceGroup._windowRecords.find(record => {
+                            if (record.windowActor === focusActor)
+                                clone = record.clone;
+
+                            return record.windowActor === focusActor;
+                        });
+                    });
+                });
+
+                if (!clone) {
+                    focusIndicator.indicate({ focus });
+                } else {
+                    const monitor = global.display.get_monitor_geometry(focus.get_monitor());
+                    const getAbsPos = actor => {
+                        // get_transformed_position seems to work during swipe
+                        // gestures but not during switching with keyboard shortcuts
+                        // havent looked into why that is...
+                        const transformPos = actor.get_transformed_position();
+                        if (transformPos[0] && transformPos[1])
+                            return { x: transformPos[0], y: transformPos[1] };
+
+                        let pos = { x: actor.x, y: actor.y };
+                        let parent = actor.get_parent();
+                        while (parent) {
+                            pos.x += parent.x;
+                            pos.y += parent.y;
+                            parent = parent.get_parent();
+                        }
+
+                        pos.x += monitor.x;
+                        pos.y += monitor.y;
+
+                        return pos;
+                    };
+                    const absPos = getAbsPos(clone);
+
+                    if (focusIndicator.indicate({
+                        focus,
+                        startingParams: {
+                            x: absPos.x,
+                            y: absPos.y,
+                        },
+                        secondaryAnim: {
+                            x: focusActor.x,
+                            y: focusActor.y,
+                            duration: transition.get_duration() - msecs,
+                            mode: Clutter.AnimationMode.EASE_OUT_CUBIC,
+                        }
+                    })) {
+                        clone.hide();
+                    }
+                }
             });
         });
     }
