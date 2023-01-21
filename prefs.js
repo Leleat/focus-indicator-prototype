@@ -26,7 +26,8 @@ function _bindSpinbuttons(settings, builder) {
         'anim-up-duration',
         'anim-down-delay',
         'anim-down-duration',
-        'workspace-switch-delay'
+        'workspace-switch-delay',
+        'idle-time'
     ];
 
     spinButtons.forEach(key => {

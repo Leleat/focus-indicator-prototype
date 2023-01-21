@@ -29,6 +29,7 @@ const { FocusIndicator } = Me.imports.src.focusIndicator;
 const { CustomAppSwitcher } = Me.imports.src.altTab;
 const { CustomWorkspaceAnimation } = Me.imports.src.workspaceAnimation;
 const { CustomSwitchToApplication } = Me.imports.src.switchToApplication;
+const { IdleIndicator } = Me.imports.src.idleIndicator;
 
 class Extension {
     constructor() {
@@ -39,6 +40,8 @@ class Extension {
         this._customAppSwitcher = new CustomAppSwitcher();
         this._customWorkspaceAnimation = new CustomWorkspaceAnimation();
         this._customSwitchToApplication = new CustomSwitchToApplication();
+        this._customSwitchToApplication = new CustomSwitchToApplication();
+        this._idleIndicator = new IdleIndicator();
 
         Main.panel.statusArea['appMenu'].container.hide();
 
@@ -58,6 +61,9 @@ class Extension {
     disable() {
         this._unlockId && Main.screenShield.actor.disconnect(this._unlockId);
         this._unlockId = 0;
+
+        this._idleIndicator.destroy();
+        this._idleIndicator = null;
 
         this._customSwitchToApplication.destroy();
         this._customSwitchToApplication = null;

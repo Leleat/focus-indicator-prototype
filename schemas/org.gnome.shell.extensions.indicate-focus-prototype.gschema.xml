@@ -25,5 +25,8 @@
 		<key name="anim-down-mode" type="i">
 			<default>29</default>
 		</key>
+		<key name="idle-time" type="i">
+			<default>120</default>
+		</key>
 	</schema>
 </schemalist>
