@@ -28,5 +28,8 @@
 		<key name="idle-time" type="i">
 			<default>120</default>
 		</key>
+		<key name="hide-app-menu" type="b">
+			<default>true</default>
+		</key>
 	</schema>
 </schemalist>
