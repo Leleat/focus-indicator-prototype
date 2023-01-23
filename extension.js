@@ -43,11 +43,15 @@ class Extension {
         this._customSwitchToApplication = new CustomSwitchToApplication();
         this._customSwitchToApplication = new CustomSwitchToApplication();
         this._idleIndicator = new IdleIndicator();
-        this._loadingSpinner = new LoadingSpinner();
+        this._loadingSpinner = null;
 
         this._settings = ExtensionUtils.getSettings(Me.metadata['settings-schema']);
-        this._settings.connect('changed::hide-app-menu', () => this.setAppMenu());
-        this.setAppMenu();
+
+        this._settings.connect('changed::hide-app-menu', () => this._setAppMenu());
+        this._setAppMenu();
+
+        this._settings.connect('changed::loading-animation', () => this._setLoadingSpinner());
+        this._setLoadingSpinner();
 
         if (this._wasLocked) {
             this._unlockId = Main.screenShield.actor.connect('hide', () => {
@@ -84,7 +88,7 @@ class Extension {
         this._focusIndicator.destroy();
         this._focusIndicator = null;
 
-        this._loadingSpinner.destroy();
+        this._loadingSpinner?.destroy();
         this._loadingSpinner = null;
 
         // Looks like g-s updates the top panel after the extensions are disabled
@@ -98,11 +102,19 @@ class Extension {
         Main.panel.statusArea['appMenu'].container.show();
     }
 
-    setAppMenu() {
+    _setAppMenu() {
         if (this._settings.get_boolean('hide-app-menu'))
             Main.panel.statusArea['appMenu'].container.hide();
         else
             Main.panel.statusArea['appMenu'].container.show();
+    }
+
+    _setLoadingSpinner() {
+        this._loadingSpinner?.destroy();
+        this._loadingSpinner = null;
+
+        if (this._settings.get_boolean('loading-animation'))
+            this._loadingSpinner = new LoadingSpinner();
     }
 }
 

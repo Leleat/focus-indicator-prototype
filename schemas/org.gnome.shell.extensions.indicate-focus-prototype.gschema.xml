@@ -31,5 +31,8 @@
 		<key name="hide-app-menu" type="b">
 			<default>true</default>
 		</key>
+		<key name="loading-animation" type="b">
+			<default>false</default>
+		</key>
 	</schema>
 </schemalist>
