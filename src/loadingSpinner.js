@@ -1,6 +1,6 @@
 'use strict';
 
-const { Clutter, GObject, Graphene, Shell, St } = imports.gi;
+const { Clutter, GObject, Shell, St } = imports.gi;
 const { main: Main } = imports.ui;
 
 var LoadingSpinner = GObject.registerClass(
@@ -14,13 +14,10 @@ class LoadingSpinner extends Clutter.Actor {
         this._activityButton = Main.panel.statusArea['activities'];
         this._activityLabel = this._activityButton.get_children()[0];
 
-        this._spinner = new Spinner({ opacity: 0 });
+        this._spinner = new Spinner();
 
-        this._container = new St.Widget({ y_align: Clutter.ActorAlign.CENTER });
         this._activityButton.remove_child(this._activityLabel);
-        this._activityButton.add_child(this._container);
-        this._container.add_child(this._activityLabel);
-        this._container.add_child(this._spinner);
+        this._activityButton.add_child(this._spinner);
 
         this._stateChangeId = Shell.AppSystem.get_default()
             .connect('app-state-changed', (_, app) => this._onAppStateChanged(app));
@@ -35,13 +32,9 @@ class LoadingSpinner extends Clutter.Actor {
         this._spinner.destroy();
         this._spinner = null;
 
-        this._activityButton.remove_child(this._container);
-        this._container.remove_child(this._activityLabel);
         this._activityButton.add_child(this._activityLabel);
         this._activityLabel = null;
         this._activityButton = null;
-        this._container.destroy();
-        this._container = null;
 
         this._targetApp = null;
         this._startingApps = [];
@@ -54,27 +47,7 @@ class LoadingSpinner extends Clutter.Actor {
             return;
 
         this._isLoadingSpinner = true;
-
-        this._activityLabel.remove_all_transitions();
-        this._spinner.remove_all_transitions();
-        this._spinner.stop();
-
-        this._activityLabel.ease({
-            opacity: 0,
-            duration: 200,
-            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-            onComplete: () => {
-                this._activityLabel.hide();
-
-                this._spinner.show();
-                this._spinner.play();
-                this._spinner.ease({
-                    opacity: 255,
-                    duration: 200,
-                    mode: Clutter.AnimationMode.EASE_OUT_QUAD
-                });
-            }
-        });
+        this._spinner.play();
     }
 
     _stopAnimation() {
@@ -82,26 +55,7 @@ class LoadingSpinner extends Clutter.Actor {
             return;
 
         this._isLoadingSpinner = false;
-
-        this._activityLabel.remove_all_transitions();
-        this._spinner.remove_all_transitions();
-
-        this._spinner.ease({
-            opacity: 0,
-            duration: 200,
-            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-            onComplete: () => {
-                this._spinner.stop();
-                this._spinner.hide();
-
-                this._activityLabel.show();
-                this._activityLabel.ease({
-                    opacity: 255,
-                    duration: 200,
-                    mode: Clutter.AnimationMode.EASE_OUT_QUAD
-                });
-            }
-        });
+        this._spinner.stop();
     }
 
     /**
@@ -158,16 +112,16 @@ class LoadingSpinner extends Clutter.Actor {
 
 const Spinner = GObject.registerClass(
 class Spinner extends St.BoxLayout {
-    _init(params = {}) {
-        super._init({ ...params });
+    _init() {
+        super._init({ y_align: Clutter.ActorAlign.CENTER });
 
         this._d1 = new St.Widget({
             style: '\
                 background-color: #e6e6e6;\
                 border-radius: 99px;\
                 margin-right: 10px;',
-            width: 6,
-            height: 6,
+            width: 7,
+            height: 7,
             opacity: 255,
         });
         this.add_child(this._d1);
@@ -177,9 +131,9 @@ class Spinner extends St.BoxLayout {
                 background-color: #e6e6e6;\
                 border-radius: 99px;\
                 margin-right: 10px;',
-            width: 6,
-            height: 6,
-            opacity: 0,
+            width: 7,
+            height: 7,
+            opacity: 255,
         });
         this.add_child(this._d2);
 
@@ -187,14 +141,38 @@ class Spinner extends St.BoxLayout {
             style: '\
                 background-color: #e6e6e6;\
                 border-radius: 99px;',
-            width: 6,
-            height: 6,
-            opacity: 0,
+            width: 7,
+            height: 7,
+            opacity: 255,
         });
         this.add_child(this._d3);
     }
 
     play() {
+        this._d1.remove_all_transitions();
+        this._d2.remove_all_transitions();
+        this._d3.remove_all_transitions();
+
+        // Animate to starting position before looping
+        this._d1.ease({
+            opacity: 255,
+            duration: 300,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+        });
+        this._d2.ease({
+            opacity: 127,
+            duration: 300,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD
+        });
+        this._d3.ease({
+            opacity: 0,
+            duration: 300,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+            onComplete: () => this._loop()
+        });
+    }
+
+    _loop() {
         this._reset();
 
         this._d1.ease({
@@ -206,7 +184,7 @@ class Spinner extends St.BoxLayout {
                 duration: 300,
                 delay: 600,
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-                onComplete: () => this.play()
+                onComplete: () => this._loop()
             })
         });
         this._d2.ease({
@@ -236,5 +214,21 @@ class Spinner extends St.BoxLayout {
         this._d1.remove_all_transitions();
         this._d2.remove_all_transitions();
         this._d3.remove_all_transitions();
+
+        this._d1.ease({
+            opacity: 255,
+            duration: 300,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD
+        });
+        this._d2.ease({
+            opacity: 255,
+            duration: 300,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD
+        });
+        this._d3.ease({
+            opacity: 255,
+            duration: 300,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD
+        });
     }
 });
