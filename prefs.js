@@ -33,11 +33,8 @@ function _bindSwitches(settings, builder) {
 
 function _bindSpinbuttons(settings, builder) {
     const spinButtons = [
-        'scale-to',
         'anim-up-delay',
         'anim-up-duration',
-        'anim-down-delay',
-        'anim-down-duration',
         'workspace-switch-delay',
         'idle-time'
     ];
@@ -52,7 +49,6 @@ function _bindSpinbuttons(settings, builder) {
 function _bindComboRows(settings, builder) {
     const comboRows = [
         'anim-up-mode',
-        'anim-down-mode'
     ];
 
     comboRows.forEach(key => {

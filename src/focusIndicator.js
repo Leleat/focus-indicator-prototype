@@ -1,6 +1,6 @@
 'use strict';
 
-const { Clutter, Gio, Graphene, Meta, Shell } = imports.gi;
+const { Clutter, Gio, Graphene, Meta, Shell, St } = imports.gi;
 const { main: Main, osdWindow: OsdWindow } = imports.ui;
 
 const EasingMode = [
@@ -110,51 +110,45 @@ var FocusIndicator = class FocusIndicator  {
         if (!source)
             return false;
 
-        // hiding doesn't work for the workspaceAnimation. It looks like the
-        // window will be shown again after the switch animation ends...?
-        source.set_opacity(0);
-
         const monitor = source.get_meta_window().get_monitor();
         const monitorRect = global.display.get_monitor_geometry(monitor);
-        const clone = this._createClone(source, monitorRect, startingParams ?? { x: source.x, y: source.y });
-        const scaleTo = animParams?.scaleTo ?? this._settings.get_int('scale-to') / 100;
         const upDelay = animParams?.upDelay ?? this._settings.get_int('anim-up-delay');
         const upDuration = animParams?.upDuration ?? this._settings.get_int('anim-up-duration');
         const upMode = animParams?.upMode ?? EasingMode[this._settings.get_int('anim-up-mode')];
-        const downDelay = animParams?.downDelay ?? this._settings.get_int('anim-down-delay');
-        const downDuration = animParams?.downDuration ?? this._settings.get_int('anim-down-duration');
-        const downMode = animParams?.downMode ?? EasingMode[this._settings.get_int('anim-down-mode')];
 
-        clone.ease({
-            scale_x: scaleTo,
-            scale_y: scaleTo,
+        const border = this._createBorder(focus, monitorRect, startingParams ?? { x: focus.get_frame_rect().x, y: focus.get_frame_rect().y });
+
+        const pos = secondaryAnim ? {} : {x: focus.get_frame_rect().x, y: focus.get_frame_rect().y,};
+
+        border.ease({
+            opacity: 255,
+            duration: secondaryAnim ? this._settings.get_int('workspace-switch-delay') : upDelay,
+            mode: Clutter.AnimationMode.EASE_IN
+        });
+
+        border.ease({
+            ...pos,
+            width: focus.get_frame_rect().width,
+            height: focus.get_frame_rect().height,
             delay: upDelay,
             duration: upDuration,
             mode: upMode,
-            onComplete: () => {
-                clone.ease({
-                    scale_x: 1,
-                    scale_y: 1,
-                    delay: downDelay,
-                    duration: downDuration,
-                    mode: downMode,
-                    onComplete: () => this.reset()
-                });
-            }
+            onComplete: () => this.reset()
         });
 
         if (secondaryAnim) {
-            // clone is a child of an actor with monitor dimensions while param
+            // border is a child of an actor with monitor dimensions while param
             // is using absolute position coords
             secondaryAnim.x = secondaryAnim.x ? secondaryAnim.x - monitorRect.x : undefined;
             secondaryAnim.y = secondaryAnim.y ? secondaryAnim.y - monitorRect.y : undefined;
-            clone.ease({ ...secondaryAnim });
+
+            border.ease({ ...secondaryAnim });
         }
 
         return true;
     }
 
-    _createClone(source, monitorRect, startingParams) {
+    _createBorder(focus, monitorRect, startingParams) {
         const clipTo = new Clutter.Actor({
             clip_to_allocation: true,
             x: monitorRect.x,
@@ -172,15 +166,17 @@ var FocusIndicator = class FocusIndicator  {
 
         this._actors.push(clipTo);
 
-        const clone = new Clutter.Clone({
-            pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
-            source,
-            x: startingParams.x - clipTo.x,
-            y: startingParams.y - clipTo.y
+        const border = new St.Widget({
+            style: `border: 4px solid #3584e4;`,
+            x: startingParams.x - clipTo.x - 100,
+            y: startingParams.y - clipTo.y - 100,
+            width: focus.get_frame_rect().width + 200,
+            height: focus.get_frame_rect().height + 200,
+            opacity: 0
         });
-        clipTo.add_child(clone);
+        clipTo.add_child(border);
 
-        return clone;
+        return border;
     }
 
     _onWindowCreated(window) {
