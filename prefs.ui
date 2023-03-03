@@ -237,6 +237,118 @@
               </child>
             </object>
           </child>
+          <child>
+            <object class="AdwActionRow">
+              <property name="title" translatable="yes">Use Border Effect</property>
+              <property name="activatable-widget">use_border</property>
+              <child>
+                <object class="GtkSwitch" id="use_border">
+                  <property name="valign">center</property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow">
+              <property name="title" translatable="yes">Border Initial Offset</property>
+              <property name="activatable-widget">border_initial_offset</property>
+              <child>
+                <object class="GtkSpinButton" id="border_initial_offset">
+                  <property name="valign">center</property>
+                  <property name="adjustment">
+                    <object class="GtkAdjustment">
+                    <property name="lower">-500</property>
+                      <property name="upper">500</property>
+                      <property name="step-increment">2</property>
+                      <property name="page-increment">50</property>
+                    </object>
+                  </property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow">
+              <property name="title" translatable="yes">Border Thickness</property>
+              <property name="activatable-widget">border_thickness</property>
+              <child>
+                <object class="GtkSpinButton" id="border_thickness">
+                  <property name="valign">center</property>
+                  <property name="adjustment">
+                    <object class="GtkAdjustment">
+                    <property name="lower">1</property>
+                      <property name="upper">50</property>
+                      <property name="step-increment">1</property>
+                      <property name="page-increment">50</property>
+                    </object>
+                  </property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow">
+              <property name="title" translatable="yes">Border Animation Duration (ms)</property>
+              <property name="activatable-widget">border_duration</property>
+              <child>
+                <object class="GtkSpinButton" id="border_duration">
+                  <property name="valign">center</property>
+                  <property name="adjustment">
+                    <object class="GtkAdjustment">
+                    <property name="lower">100</property>
+                      <property name="upper">2000</property>
+                      <property name="step-increment">1</property>
+                      <property name="page-increment">50</property>
+                    </object>
+                  </property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwComboRow" id="border_mode">
+              <property name="title" translatable="yes">Border Easing</property>
+              <property name="model">
+                <object class="GtkStringList">
+                  <items>
+                    <item>Ease In</item>
+                    <item>Ease In Back</item>
+                    <item>Ease In Bounce</item>
+                    <item>Ease In Circ</item>
+                    <item>Ease In Cubic</item>
+                    <item>Ease In Elastic</item>
+                    <item>Ease In Expo</item>
+                    <item>Ease In Out</item>
+                    <item>Ease In Out Back</item>
+                    <item>Ease In Out Bounce</item>
+                    <item>Ease In Out Circ</item>
+                    <item>Ease In Out Cubic</item>
+                    <item>Ease In Out Elastic</item>
+                    <item>Ease In Out Expo</item>
+                    <item>Ease In Out Quad</item>
+                    <item>Ease In Out Quart</item>
+                    <item>Ease In Out Quint</item>
+                    <item>Ease In Out Sine</item>
+                    <item>Ease In Quad</item>
+                    <item>Ease In Quart</item>
+                    <item>Ease In Quint</item>
+                    <item>Ease In Sine</item>
+                    <item>Ease Out</item>
+                    <item>Ease Out Back</item>
+                    <item>Ease Out Bounce</item>
+                    <item>Ease Out Circ</item>
+                    <item>Ease Out Cubic</item>
+                    <item>Ease Out Elastic</item>
+                    <item>Ease Out Expo</item>
+                    <item>Ease Out Quad</item>
+                    <item>Ease Out Quart</item>
+                    <item>Ease Out Quint</item>
+                    <item>Ease Out Sine</item>
+                  </items>
+                </object>
+              </property>
+            </object>
+          </child>
         </object>
       </child>
   </object>

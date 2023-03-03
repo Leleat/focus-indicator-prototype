@@ -22,7 +22,8 @@ function fillPreferencesWindow(window) {
 
 function _bindSwitches(settings, builder) {
     const switches = [
-        'hide-app-menu'
+        'hide-app-menu',
+        'use-border'
     ];
 
     switches.forEach(key => {
@@ -39,7 +40,10 @@ function _bindSpinbuttons(settings, builder) {
         'anim-down-delay',
         'anim-down-duration',
         'workspace-switch-delay',
-        'idle-time'
+        'idle-time',
+        'border-initial-offset',
+        'border-thickness',
+        'border-duration',
     ];
 
     spinButtons.forEach(key => {
@@ -52,7 +56,8 @@ function _bindSpinbuttons(settings, builder) {
 function _bindComboRows(settings, builder) {
     const comboRows = [
         'anim-up-mode',
-        'anim-down-mode'
+        'anim-down-mode',
+        'border-mode',
     ];
 
     comboRows.forEach(key => {

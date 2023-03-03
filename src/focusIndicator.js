@@ -1,6 +1,6 @@
 'use strict';
 
-const { Clutter, Gio, Graphene, Meta, Shell } = imports.gi;
+const { Clutter, Gio, Graphene, Meta, Shell, St } = imports.gi;
 const { main: Main, osdWindow: OsdWindow } = imports.ui;
 
 const EasingMode = [
@@ -110,6 +110,25 @@ var FocusIndicator = class FocusIndicator  {
         if (!source)
             return false;
 
+        const actor = this._settings.get_boolean('use-border')
+            ? this._scaleBorder(focus, startingParams, animParams, secondaryAnim)
+            : this._scaleWindow(source, startingParams, animParams);
+
+        // Workspace switch animation
+        if (secondaryAnim) {
+            // actor is a child of an actor with monitor dimensions while param
+            // is using absolute position coords
+            const monitor = focus.get_monitor();
+            const monitorRect = global.display.get_monitor_geometry(monitor);
+            secondaryAnim.x = secondaryAnim.x ? secondaryAnim.x - monitorRect.x : undefined;
+            secondaryAnim.y = secondaryAnim.y ? secondaryAnim.y - monitorRect.y : undefined;
+            actor.ease({ ...secondaryAnim });
+        }
+
+        return true;
+    }
+
+    _scaleWindow(source, startingParams, animParams) {
         // hiding doesn't work for the workspaceAnimation. It looks like the
         // window will be shown again after the switch animation ends...?
         source.set_opacity(0);
@@ -143,15 +162,36 @@ var FocusIndicator = class FocusIndicator  {
             }
         });
 
-        if (secondaryAnim) {
-            // clone is a child of an actor with monitor dimensions while param
-            // is using absolute position coords
-            secondaryAnim.x = secondaryAnim.x ? secondaryAnim.x - monitorRect.x : undefined;
-            secondaryAnim.y = secondaryAnim.y ? secondaryAnim.y - monitorRect.y : undefined;
-            clone.ease({ ...secondaryAnim });
-        }
+        return clone;
+    }
 
-        return true;
+    _scaleBorder(focus, startingParams, animParams, secondaryAnim) {
+        const monitor = focus.get_monitor();
+        const monitorRect = global.display.get_monitor_geometry(monitor);
+        const border = this._createBorder(focus, monitorRect, startingParams ??
+            { x: focus.get_frame_rect().x, y: focus.get_frame_rect().y });
+        const upDelay = animParams?.upDelay ?? 0;
+        const upDuration = animParams?.upDuration ?? this._settings.get_int('border-duration');
+        const upMode = animParams?.upMode ?? EasingMode[this._settings.get_int('border-mode')];
+        const pos = secondaryAnim ? {} : { x: focus.get_frame_rect().x, y: focus.get_frame_rect().y };
+
+        border.ease({
+            opacity: 255,
+            duration: secondaryAnim ? this._settings.get_int('workspace-switch-delay') : upDelay,
+            mode: Clutter.AnimationMode.EASE_IN
+        });
+
+        border.ease({
+            ...pos,
+            width: focus.get_frame_rect().width,
+            height: focus.get_frame_rect().height,
+            delay: upDelay,
+            duration: upDuration,
+            mode: upMode,
+            onComplete: () => this.reset()
+        });
+
+        return border;
     }
 
     _createClone(source, monitorRect, startingParams) {
@@ -181,6 +221,39 @@ var FocusIndicator = class FocusIndicator  {
         clipTo.add_child(clone);
 
         return clone;
+    }
+
+    _createBorder(focus, monitorRect, startingParams) {
+        const clipTo = new Clutter.Actor({
+            clip_to_allocation: true,
+            x: monitorRect.x,
+            y: monitorRect.y,
+            width: monitorRect.width,
+            height: monitorRect.height,
+        });
+        const osd = Main.uiGroup.get_children().find(child =>
+            child instanceof OsdWindow.OsdWindow);
+
+        if (osd)
+            Main.uiGroup.insert_child_below(clipTo, osd);
+        else
+            Main.uiGroup.add_child(clipTo);
+
+        this._actors.push(clipTo);
+
+        const thickness = this._settings.get_int('border-thickness');
+        const offset = this._settings.get_int('border-initial-offset');
+        const border = new St.Widget({
+            style: `border: ${thickness}px solid #3584e4;`,
+            x: startingParams.x - clipTo.x - offset / 2,
+            y: startingParams.y - clipTo.y - offset / 2,
+            width: focus.get_frame_rect().width + offset,
+            height: focus.get_frame_rect().height + offset,
+            opacity: 0
+        });
+        clipTo.add_child(border);
+
+        return border;
     }
 
     _onWindowCreated(window) {

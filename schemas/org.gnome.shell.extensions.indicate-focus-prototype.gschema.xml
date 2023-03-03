@@ -31,8 +31,20 @@
 		<key name="hide-app-menu" type="b">
 			<default>true</default>
 		</key>
-		<key name="loading-animation" type="b">
+		<key name="use-border" type="b">
 			<default>false</default>
+		</key>
+		<key name="border-initial-offset" type="i">
+			<default>200</default>
+		</key>
+		<key name="border-thickness" type="i">
+			<default>4</default>
+		</key>
+		<key name="border-duration" type="i">
+			<default>250</default>
+		</key>
+		<key name="border-mode" type="i">
+			<default>29</default>
 		</key>
 	</schema>
 </schemalist>
