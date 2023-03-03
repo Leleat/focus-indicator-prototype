@@ -7,42 +7,6 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const { FocusIndicator } = Me.imports.src.focusIndicator;
 
-const EasingMode = [
-    Clutter.AnimationMode.EASE_IN,
-    Clutter.AnimationMode.EASE_IN_BACK,
-    Clutter.AnimationMode.EASE_IN_BOUNCE,
-    Clutter.AnimationMode.EASE_IN_CIRC,
-    Clutter.AnimationMode.EASE_IN_CUBIC,
-    Clutter.AnimationMode.EASE_IN_ELASTIC,
-    Clutter.AnimationMode.EASE_IN_EXPO,
-    Clutter.AnimationMode.EASE_IN_OUT,
-    Clutter.AnimationMode.EASE_IN_OUT_BACK,
-    Clutter.AnimationMode.EASE_IN_OUT_BOUNCE,
-    Clutter.AnimationMode.EASE_IN_OUT_CIRC,
-    Clutter.AnimationMode.EASE_IN_OUT_CUBIC,
-    Clutter.AnimationMode.EASE_IN_OUT_ELASTIC,
-    Clutter.AnimationMode.EASE_IN_OUT_EXPO,
-    Clutter.AnimationMode.EASE_IN_OUT_QUAD,
-    Clutter.AnimationMode.EASE_IN_OUT_QUART,
-    Clutter.AnimationMode.EASE_IN_OUT_QUINT,
-    Clutter.AnimationMode.EASE_IN_OUT_SINE,
-    Clutter.AnimationMode.EASE_IN_QUAD,
-    Clutter.AnimationMode.EASE_IN_QUART,
-    Clutter.AnimationMode.EASE_IN_QUINT,
-    Clutter.AnimationMode.EASE_IN_SINE,
-    Clutter.AnimationMode.EASE_OUT,
-    Clutter.AnimationMode.EASE_OUT_BACK,
-    Clutter.AnimationMode.EASE_OUT_BOUNCE,
-    Clutter.AnimationMode.EASE_OUT_CIRC,
-    Clutter.AnimationMode.EASE_OUT_CUBIC,
-    Clutter.AnimationMode.EASE_OUT_ELASTIC,
-    Clutter.AnimationMode.EASE_OUT_EXPO,
-    Clutter.AnimationMode.EASE_OUT_QUAD,
-    Clutter.AnimationMode.EASE_OUT_QUART,
-    Clutter.AnimationMode.EASE_OUT_QUINT,
-    Clutter.AnimationMode.EASE_OUT_SINE
-];
-
 var CustomWorkspaceAnimation = class CustomWorkspaceAnimation {
     constructor() {
         this._workspaceAnimationAnimateSwitch = Main.wm._workspaceAnimation.animateSwitch;
@@ -191,21 +155,20 @@ var CustomWorkspaceAnimation = class CustomWorkspaceAnimation {
                 if (focusIndicator.indicate({
                     focus,
                     startingParams: {
-                        x: focus.get_frame_rect().x,
-                        y: focus.get_frame_rect().y,
+                        x: absPos.x,
+                        y: absPos.y,
                     },
                     animParams: {
                         upDelay: settings.get_int('workspace-switch-delay')
                     },
                     secondaryAnim: {
-                        x: focus.get_frame_rect().x,
-                        y: focus.get_frame_rect().y,
-                        delay: settings.get_int('workspace-switch-delay'),
-                        duration: settings.get_int('anim-up-duration'),
-                        mode: EasingMode[settings.get_int('anim-up-mode')],
+                        x: focusActor.x,
+                        y: focusActor.y,
+                        duration: 250,
+                        mode: Clutter.AnimationMode.EASE_OUT_CUBIC,
                     }
                 })) {
-                    // clone.hide();
+                    clone.hide();
                 }
             }
         }
@@ -293,17 +256,17 @@ var CustomWorkspaceAnimation = class CustomWorkspaceAnimation {
                     if (focusIndicator.indicate({
                         focus,
                         startingParams: {
-                            x: focus.get_frame_rect().x,
-                            y: focus.get_frame_rect().y,
+                            x: absPos.x,
+                            y: absPos.y,
                         },
                         secondaryAnim: {
-                            x: focus.get_frame_rect().x,
-                            y: focus.get_frame_rect().y,
-                            duration: settings.get_int('anim-up-duration') - msecs,
-                            mode: EasingMode[settings.get_int('anim-up-mode')],
+                            x: focusActor.x,
+                            y: focusActor.y,
+                            duration: transition.get_duration() - msecs,
+                            mode: Clutter.AnimationMode.EASE_OUT_CUBIC,
                         }
                     })) {
-                        // clone.hide();
+                        clone.hide();
                     }
                 }
             });

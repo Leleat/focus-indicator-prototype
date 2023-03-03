@@ -26,7 +26,26 @@
           </child>
           <child>
             <object class="AdwActionRow">
-              <property name="title" translatable="yes">Delay (ms)</property>
+              <property name="title" translatable="yes">Scale To (%)</property>
+              <property name="activatable-widget">scale_to</property>
+              <child>
+                <object class="GtkSpinButton" id="scale_to">
+                  <property name="valign">center</property>
+                  <property name="adjustment">
+                    <object class="GtkAdjustment">
+                    <property name="lower">100</property>
+                      <property name="upper">200</property>
+                      <property name="step-increment">1</property>
+                      <property name="page-increment">50</property>
+                    </object>
+                  </property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow">
+              <property name="title" translatable="yes">Scale Up Delay (ms)</property>
               <property name="activatable-widget">anim_up_delay</property>
               <child>
                 <object class="GtkSpinButton" id="anim_up_delay">
@@ -45,7 +64,7 @@
           </child>
           <child>
             <object class="AdwActionRow">
-              <property name="title" translatable="yes">Animation Duration (ms)</property>
+              <property name="title" translatable="yes">Scale Up Animation Duration (ms)</property>
               <property name="activatable-widget">anim_up_duration</property>
               <child>
                 <object class="GtkSpinButton" id="anim_up_duration">
@@ -64,7 +83,89 @@
           </child>
           <child>
             <object class="AdwComboRow" id="anim_up_mode">
-              <property name="title" translatable="yes">Easing</property>
+              <property name="title" translatable="yes">Scale Up Easing</property>
+              <property name="model">
+                <object class="GtkStringList">
+                  <items>
+                    <item>Ease In</item>
+                    <item>Ease In Back</item>
+                    <item>Ease In Bounce</item>
+                    <item>Ease In Circ</item>
+                    <item>Ease In Cubic</item>
+                    <item>Ease In Elastic</item>
+                    <item>Ease In Expo</item>
+                    <item>Ease In Out</item>
+                    <item>Ease In Out Back</item>
+                    <item>Ease In Out Bounce</item>
+                    <item>Ease In Out Circ</item>
+                    <item>Ease In Out Cubic</item>
+                    <item>Ease In Out Elastic</item>
+                    <item>Ease In Out Expo</item>
+                    <item>Ease In Out Quad</item>
+                    <item>Ease In Out Quart</item>
+                    <item>Ease In Out Quint</item>
+                    <item>Ease In Out Sine</item>
+                    <item>Ease In Quad</item>
+                    <item>Ease In Quart</item>
+                    <item>Ease In Quint</item>
+                    <item>Ease In Sine</item>
+                    <item>Ease Out</item>
+                    <item>Ease Out Back</item>
+                    <item>Ease Out Bounce</item>
+                    <item>Ease Out Circ</item>
+                    <item>Ease Out Cubic</item>
+                    <item>Ease Out Elastic</item>
+                    <item>Ease Out Expo</item>
+                    <item>Ease Out Quad</item>
+                    <item>Ease Out Quart</item>
+                    <item>Ease Out Quint</item>
+                    <item>Ease Out Sine</item>
+                  </items>
+                </object>
+              </property>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow">
+              <property name="title" translatable="yes">Scale Down Delay (ms)</property>
+              <property name="activatable-widget">anim_down_delay</property>
+              <child>
+                <object class="GtkSpinButton" id="anim_down_delay">
+                  <property name="valign">center</property>
+                  <property name="adjustment">
+                    <object class="GtkAdjustment">
+                    <property name="lower">0</property>
+                      <property name="upper">2000</property>
+                      <property name="step-increment">1</property>
+                      <property name="page-increment">50</property>
+                    </object>
+                  </property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow">
+              <property name="title" translatable="yes">Scale Down Animation Duration (ms)</property>
+              <property name="activatable-widget">anim_down_duration</property>
+              <child>
+                <object class="GtkSpinButton" id="anim_down_duration">
+                  <property name="valign">center</property>
+                  <property name="adjustment">
+                    <object class="GtkAdjustment">
+                    <property name="lower">100</property>
+                      <property name="upper">2000</property>
+                      <property name="step-increment">1</property>
+                      <property name="page-increment">50</property>
+                    </object>
+                  </property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwComboRow" id="anim_down_mode">
+              <property name="title" translatable="yes">Scale Down Easing</property>
               <property name="model">
                 <object class="GtkStringList">
                   <items>
