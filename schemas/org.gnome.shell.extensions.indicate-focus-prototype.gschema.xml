@@ -1,50 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
 	<schema id="org.gnome.shell.extensions.indicate-focus-prototype" path="/org/gnome/shell/extensions/indicate-focus-prototype/">
-		<key name="workspace-switch-delay" type="i">
-			<default>200</default>
-		</key>
-		<key name="scale-to" type="i">
-			<default>101</default>
-		</key>
-		<key name="anim-up-delay" type="i">
+		<key name="focus-hint" type="i">
 			<default>0</default>
-		</key>
-		<key name="anim-up-duration" type="i">
-			<default>100</default>
-		</key>
-		<key name="anim-up-mode" type="i">
-			<default>29</default>
-		</key>
-		<key name="anim-down-delay" type="i">
-			<default>0</default>
-		</key>
-		<key name="anim-down-duration" type="i">
-			<default>150</default>
-		</key>
-		<key name="anim-down-mode" type="i">
-			<default>29</default>
-		</key>
-		<key name="idle-time" type="i">
-			<default>120</default>
-		</key>
-		<key name="hide-app-menu" type="b">
-			<default>true</default>
-		</key>
-		<key name="use-border" type="b">
-			<default>false</default>
-		</key>
-		<key name="border-initial-offset" type="i">
-			<default>200</default>
-		</key>
-		<key name="border-thickness" type="i">
-			<default>4</default>
-		</key>
-		<key name="border-duration" type="i">
-			<default>250</default>
-		</key>
-		<key name="border-mode" type="i">
-			<default>29</default>
 		</key>
 	</schema>
 </schemalist>
